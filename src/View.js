@@ -1,162 +1,157 @@
-const mainSection = document.querySelector(".main"); // main pole where uls lives
-const filtersBar = document.querySelector("#footer-bar"); //footer bar with counter and filters
-let todoUl = document.querySelector("#todo-list");
-const clrLclBtn = document.querySelector("#clear-local"); //clear local btn
-const markThemAllBtn = document.querySelector("#mark-em-all"); //btn for mark unmark;
-
-let testBtn = document.querySelector("#testgetbtn");
-const inputText = document.querySelector("input.new-todo"); //input text
-let allBtn = document.querySelector("#all");
-let activeBtn = document.querySelector("#active");
-let completedBtn = document.querySelector("#completed");
-const emitter = new EventEmitter();
-
-// tag visibility
-function displayStyle(tag, visibility) {
-  if (visibility) {
-    tag.style = "display:block";
-  } else {
-    tag.style = "display:none";
-  }
-}
-///emit => listeners
-//input on enter
-inputText.addEventListener("keydown", function (e) {
-  if (e.keyCode == 13 && this.value !== "") {
-    emitter.emit(`event:onEnter`, this.value);
-    this.value = ``;
-  }
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+//input field
+const input = document.querySelector("#input");
+//counts and buttons block
+const butCountBar = document.querySelector(".task_list_footer_wrapper");
+//filter buttons
+const allBtn = document.querySelector("#all");
+const activeBtn = document.querySelector("#active");
+const completedBtn = document.querySelector("#completed");
+//markallBtn(visible label)
+const markallBtn = document.querySelector("#label-mark-all");
+//display none checkbox
+const markAllCheckbox = document.querySelector("#mark-all");
+//filter status
+let filterCondition = "";
+//emits events
+//onEnter
+input === null || input === void 0 ? void 0 : input.addEventListener("keydown", function (e) {
+    if (e.keyCode == 13 && this.value != "") {
+        emitter.emit("event:onEnter", this.value);
+        this.value = "";
+    }
 });
-// emit on click=>delete,click=>mark
-mainSection.addEventListener("click", function (e) {
-  let x = e.target;
-  let id;
-  if (x.className == "destroy") {
-    id = x.id.slice(7);
-    emitter.emit(`event:onDelete`, id);
-  } else if (x.className == "toggle") {
-    id = x.id.slice(5);
-    emitter.emit(`event:onMark`, id);
-  }
+//Mark&Delete
+tasklist === null || tasklist === void 0 ? void 0 : tasklist.addEventListener("click", function (e) {
+    let x = e.target;
+    let id;
+    if (x.className == "close") {
+        id = x.id.slice(7);
+        emitter.emit("event:Delete", id);
+    }
+    else if (x.className == "checkbox_label") {
+        id = x.id.slice(6);
+        emitter.emit("event:Mark", id);
+    }
 });
-//emit => click clearbtn
-clrLclBtn.addEventListener("click", function () {
-  emitter.emit(`event:onClear`);
+//mark all
+markallBtn === null || markallBtn === void 0 ? void 0 : markallBtn.addEventListener("click", function () {
+    emitter.emit("event:MarkAll", markAllCheckbox === null || markAllCheckbox === void 0 ? void 0 : markAllCheckbox.checked);
 });
-//emit -< click mark them all
-markThemAllBtn.addEventListener("click", function () {
-  emitter.emit(`event:markAll`);
+//filters
+allBtn === null || allBtn === void 0 ? void 0 : allBtn.addEventListener("click", function () {
+    filterCondition = "all";
+    emitter.emit("filter:all", filterCondition);
 });
-//emit filter buttons on click
-allBtn.addEventListener("click", function () {
-  emitter.emit(`event:allBtn`);
+activeBtn === null || activeBtn === void 0 ? void 0 : activeBtn.addEventListener("click", function () {
+    filterCondition = "active";
+    emitter.emit("filter:active", filterCondition);
 });
-activeBtn.addEventListener("click", function () {
-  emitter.emit(`event:activeBtn`);
+completedBtn === null || completedBtn === void 0 ? void 0 : completedBtn.addEventListener("click", function () {
+    filterCondition = "completed";
+    emitter.emit("filter:completed", filterCondition);
 });
-completedBtn.addEventListener("click", function () {
-  emitter.emit(`event:completedBtn`);
-});
-
 class View {
-  constructor() {}
-  static showFooterBar(x, y) {
-    if (x) {
-      displayStyle(mainSection, true);
-    } else {
-      displayStyle(mainSection, false);
+    constructor() { }
+    //for solo todo
+    static printTodo(todo) {
+        Template.insertTodo(todo);
+        View.showFooter(true);
+        View.count();
     }
-    if (y) {
-      displayStyle(filtersBar, true);
-    } else {
-      displayStyle(filtersBar, false);
-    }
-  }
-  static remove(element) {
-    element.parentNode.parentNode.remove();
-  }
-  static markEmAll(status) {
-    let liArray = mainSection.querySelectorAll("li");
-    for (let li of liArray) {
-      let mark = li.querySelector("input");
-      if (status) {
-        mark.checked = false;
-        li.className = "";
-      } else {
-        li.className = "completed";
-        mark.checked = true;
-      }
-    }
-  }
-  static counter(x) {
-    let target = document.querySelector("#count");
-   
-      Store.setCount(x);
-      if (x == 1) {
-        target.textContent = `${x} item left`;
-        View.showFooterBar(true, true);
-      } else if (x > 1) {
-        target.textContent = `${x} items left`;
-      } else {
-        View.showFooterBar(true, false);
-      }
-    }
-    
-
-  static counterOnReload() {
-    let target = document.querySelector("#count");
-    let x = Store.getCount();
-    if (x == 1) {
-      target.textContent = `${x} item left`;
-      View.showFooterBar(true, true);
-    } else if (x > 1) {
-      target.textContent = `${x} items left`;
-    } else {
-      View.showFooterBar(true, false);
-    }
-  }
-  static showAll(array) {
-    for (let todo of array) {
-      ToDoTemplate.showMeDom(todo);
-    }
-  }
-  static showTodo(todo) {
-    ToDoTemplate.showMeDom(todo);
-  }
-  static delete(id) {
-    let li = document.getElementById(id);
-    li.remove();
-  }
-  static mark(id) {
-    let li = document.getElementById(id);
-    li.classList.toggle("completed");
-    let mark = li.querySelector("input");
-    mark.checked = mark.checked;
-  }
-  static filter(status) {
-    Store.setStatusFilter(status);
-    let liArray = Array.from(mainSection.querySelectorAll("li"));
-    if (status == "all") {
-      for (let li of liArray) {
-        li.setAttribute("style", "display:block");
-      }
-    } else if (status == "active") {
-      for (let li of liArray)
-        if (li.classList.contains("completed")) {
-          li.setAttribute("style", "display:none");
-        } else {
-          li.setAttribute("style", "display:block");
+    //for all todos
+    static printTodos(todosArray) {
+        for (let todo of todosArray) {
+            Template.insertTodo(todo);
         }
-    } else if (status == "completed") {
-      for (let li of liArray)
-        if (li.classList.contains("completed")) {
-          li.setAttribute("style", "display:block");
-        } else {
-          li.setAttribute("style", "display:none");
+        View.showFooter(true);
+        View.count();
+    }
+    static delete(id) {
+        let task = document.getElementById(id);
+        task === null || task === void 0 ? void 0 : task.remove();
+        View.count();
+    }
+    static mark(id) {
+        let task = document.getElementById(id);
+        task === null || task === void 0 ? void 0 : task.classList.toggle("completed");
+    }
+    static markAll(condition) {
+        let todosArray = document.querySelectorAll(".task-list-task");
+        for (let todo of todosArray) {
+            let checkbox = todo.querySelector(".checkbox_input");
+            checkbox.checked = condition;
+            if (condition) {
+                todo.className = "task-list-task completed";
+            }
+            else {
+                todo.className = "task-list-task";
+            }
         }
     }
-  }
-  static clearDom() {
-    todoUl.innerHTML = "";
-  }
+    //visibility of btns and counter block
+    static showFooter(param) {
+        if (param) {
+            butCountBar === null || butCountBar === void 0 ? void 0 : butCountBar.setAttribute("style", "display:block");
+        }
+        else {
+            butCountBar === null || butCountBar === void 0 ? void 0 : butCountBar.setAttribute("style", "display:none");
+        }
+    }
+    static count() {
+        let counter = document.querySelector(".counter");
+        let todoArray = document.querySelectorAll(".task-list-task");
+        let x = todoArray.length;
+        counter.innerHTML = `todo amount: ${x}`;
+        if (x == 0) {
+            this.showFooter(false);
+        }
+    }
+    static filter(filterCondition) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (filterCondition == "noFilter") {
+                return;
+            }
+            let todosArray = Array.from(document.querySelectorAll(".task-list-task"));
+            if (filterCondition) {
+                yield StoreFilterStatus.setFilterStatus(filterCondition);
+            }
+            if (filterCondition == "completed") {
+                for (let todo of todosArray) {
+                    if (todo.classList.contains("completed")) {
+                        todo.setAttribute("style", "display:inline-flex");
+                    }
+                    else {
+                        todo.setAttribute("style", "display:none");
+                    }
+                }
+            }
+            else if (filterCondition == "active") {
+                for (let todo of todosArray) {
+                    if (todo.classList.contains("completed")) {
+                        todo.setAttribute("style", "display:none");
+                    }
+                    else {
+                        todo.setAttribute("style", "display:inline-flex");
+                    }
+                }
+            }
+            else {
+                {
+                    for (let todo of todosArray) {
+                        todo.setAttribute("style", "display:inline-flex");
+                    }
+                }
+            }
+        });
+    }
 }

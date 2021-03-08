@@ -1,30 +1,44 @@
-class ToDoTemplate {
-  constructor() {}
-  static showMeDom(todo) {
-    let ul = document.querySelector(".todo-list");
-    let li = document.createElement("li");
-    li.id = todo.id;
-    if (todo.isCompleted) {
-      li.className = "completed";
-    } else {
-      li.className = "";
+"use strict";
+const tasklist = document.querySelector(".task-list");
+class Template {
+    constructor() { }
+    static insertTodo(todo) {
+        let newTaskWrapper = document.createElement("div");
+        let button = document.createElement("button");
+        let checkbox = document.createElement("input");
+        checkbox.checked = todo.isCompleted;
+        let checkboxWrapper = document.createElement("div");
+        let checkboxLabel = document.createElement("label");
+        let taskName = document.createElement("div");
+        button.className = "close";
+        button.id = `delete-${todo.id}`;
+        if (todo.isCompleted) {
+            newTaskWrapper.className = "task-list-task completed";
+        }
+        else {
+            newTaskWrapper.className = "task-list-task";
+        }
+        newTaskWrapper.id = todo.id;
+        newTaskWrapper.setAttribute("draggable", "true");
+        taskName.innerHTML = todo.name;
+        taskName.className = "taskname";
+        checkboxWrapper.className = "checkbox";
+        checkbox.setAttribute("type", "checkbox");
+        checkbox.id = `mark-${todo.id}`;
+        checkbox.className = "checkbox_input";
+        checkboxLabel.className = "checkbox_label";
+        checkboxLabel.setAttribute("for", checkbox.id);
+        checkboxLabel.id = `label-${todo.id}`;
+        if (tasklist) {
+            tasklist.append(newTaskWrapper);
+            newTaskWrapper.append(button);
+            checkboxWrapper.append(checkbox);
+            checkboxWrapper.append(checkboxLabel);
+            newTaskWrapper.append(checkboxWrapper);
+            newTaskWrapper.append(taskName);
+        }
+        else {
+            alert("no needed element error");
+        }
     }
-    let div = document.createElement("div");
-    div.className = "view";
-    let markArea = document.createElement("input");
-    markArea.className = "toggle";
-    markArea.type = "checkbox";
-    markArea.checked = todo.isCompleted;
-    markArea.id = `mark-${todo.id}`;
-    let label = document.createElement("label");
-    label.textContent = todo.name;
-    let deleteBtn = document.createElement("button");
-    deleteBtn.className = "destroy";
-    deleteBtn.id = `delete-${todo.id}`;
-    ul.append(li);
-    li.append(div);
-    div.append(markArea);
-    div.append(label);
-    div.append(deleteBtn);
-  }
 }
