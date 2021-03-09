@@ -13,7 +13,7 @@ mongoose.connect("mongodb://localhost/toDoCollection", {
 });
 mongoose.connection
   .once("open", function () {
-    console.log("connection is up");
+    console.log("connection to db is up");
   })
   .on("error", function (error) {
     console.log("error>>>>>>", error);
@@ -50,39 +50,36 @@ router.get("/getall", function (req, res) {
 });
 router.delete("/delete", textParser, function (req, res) {
   try {
-    todo
-      .findOneAndRemove({ id: req.body })
-      .then(() => res.end());
+    todo.findOneAndRemove({ id: req.body }).then(() => res.end());
   } catch (error) {
     res.write(`error ${error}`);
     res.end();
   }
 });
 router.patch("/patch", textParser, function (req, res) {
-    try {
-        todo.findOne({ id: req.body }).then(function (result) {
-          todo
-            .findOneAndUpdate(
-              { id: req.body },
-              { $set: { isCompleted: !result.isCompleted } }
-            )
-            .then(()=>res.end());
-          
-        });
-      } catch (error) {
-        res.write(`error ${error}`);
-        res.end();
-      }
-  });
-  router.put("/put", textParser, function (req, res) {
-    let condition = req.body;
-    try {
+  try {
+    todo.findOne({ id: req.body }).then(function (result) {
       todo
-        .updateMany({}, { $set: { isCompleted: condition } })
-        .then(()=>  res.end());
-    } catch (error) {
-      res.write(`all updated error ${error}`);
-      res.end();
-    }
-  });
+        .findOneAndUpdate(
+          { id: req.body },
+          { $set: { isCompleted: !result.isCompleted } }
+        )
+        .then(() => res.end());
+    });
+  } catch (error) {
+    res.write(`error ${error}`);
+    res.end();
+  }
+});
+router.put("/put", textParser, function (req, res) {
+  let condition = req.body;
+  try {
+    todo
+      .updateMany({}, { $set: { isCompleted: condition } })
+      .then(() => res.end());
+  } catch (error) {
+    res.write(`all updated error ${error}`);
+    res.end();
+  }
+});
 module.exports = router;

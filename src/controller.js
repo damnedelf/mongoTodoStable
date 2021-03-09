@@ -1,6 +1,6 @@
 "use strict";
-StoreTodos.getAll(View.printTodos)
-    .then(() => View.filter(StoreFilterStatus.getFilterStatus()))
+StoreTodos.getAll()
+    .then((result) => View.printTodos(result))
     .then(() => handleDD());
 emitter.subscribe(`event:onEnter`, function (name) {
     StoreTodos.post(name, View.printTodo);
@@ -17,7 +17,6 @@ emitter.subscribe("event:MarkAll", function (condition) {
     View.markAll(!condition);
     StoreTodos.updateAll(condition);
 });
-//?
 function emitFilterHandler(status) {
     emitter.subscribe(status, function (filterCondition) {
         View.filter(filterCondition);

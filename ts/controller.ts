@@ -1,9 +1,9 @@
-StoreTodos.getAll(View.printTodos)
-.then(()=>View.filter(StoreFilterStatus.getFilterStatus()))
-.then(()=>handleDD());
+StoreTodos.getAll()
+  .then((result) => View.printTodos(result))
+  .then(() => handleDD());
 
 emitter.subscribe(`event:onEnter`, function (name: string) {
-StoreTodos.post(name, View.printTodo);
+  StoreTodos.post(name, View.printTodo);
 });
 
 emitter.subscribe("event:Delete", function (id: string) {
@@ -14,11 +14,10 @@ emitter.subscribe("event:Mark", function (id: string) {
   View.mark(id);
   StoreTodos.update(id);
 });
-emitter.subscribe("event:MarkAll", function (condition: boolean) {
+emitter.subscribe("event:MarkAll", function (condition: string) {
   View.markAll(!condition);
   StoreTodos.updateAll(condition);
 });
-//?
 function emitFilterHandler(status: string) {
   emitter.subscribe(status, function (filterCondition: string) {
     View.filter(filterCondition);

@@ -8,4 +8,4 @@ const rootPath = path.resolve();
 app.use(express.static(rootPath));
 app.use("/todo", router);
 
-app.listen(port, console.log(`server is listening:${port} `));
+app.listen(port, console.log(`server up===>>>>>localhost:${port} `));

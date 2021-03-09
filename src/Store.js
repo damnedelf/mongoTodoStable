@@ -18,27 +18,26 @@ class StoreTodos {
         })
             .catch((error) => alert(`post error : ${error}`));
     }
-    static getAll(callback) {
+    static getAll() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield fetch("/todo/getall", { method: "GET" })
-                .then((response) => response.text())
-                .then((result) => {
-                callback(JSON.parse(result));
-            })
-                .catch((error) => alert(`get array from db ${error}`));
+            try {
+                let response = yield fetch("/todo/getall", { method: "GET" });
+                let todoArray = yield response.json();
+                return todoArray;
+            }
+            catch (error) {
+                console.log(`get all error ${error}`);
+            }
         });
     }
     static delete(id) {
-        fetch('/todo/delete', { method: "DELETE", body: id })
-            .catch((error) => alert(`error delete  ${error}`));
+        fetch("/todo/delete", { method: "DELETE", body: id }).catch((error) => alert(`error delete  ${error}`));
     }
     static update(id) {
-        fetch(`/todo/patch`, { method: "PATCH", body: id })
-            .catch((error) => alert(`error update ${error}`));
+        fetch("/todo/patch", { method: "PATCH", body: id }).catch((error) => alert(`error update ${error}`));
     }
-    //i see dat error. cannot imagine how to fix dat
     static updateAll(status) {
-        fetch(`/todo/put`, { method: "PUT", body: !status })
+        fetch(`/todo/put`, { method: "PUT", body: "" + !status })
             .then((response) => response.text())
             .then((result) => console.log(result))
             .catch((error) => alert(`error updated all  ${error}`));
